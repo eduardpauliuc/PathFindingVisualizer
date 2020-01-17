@@ -109,6 +109,16 @@ def checkForClicks():
             pygame.display.quit()
             pygame.quit()
             exit()
+        elif event.type == pygame.KEYDOWN:
+            # Pause
+            if event.key == pygame.K_SPACE:
+                isPaused = True
+                while isPaused == True:
+                    e = pygame.event.get()
+                    pygame.event.clear()
+                    for newev in e:
+                        if newev.type == pygame.KEYDOWN and newev.key == pygame.K_SPACE:
+                            isPaused = False
     
     if pygame.mouse.get_pressed()[0]:
             try:
@@ -116,8 +126,6 @@ def checkForClicks():
                 mousePress(pos)
             except AttributeError:
                 pass
-
-
 
 def showVisited(visitedOrder):
     global isAnimating

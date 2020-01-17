@@ -23,5 +23,5 @@ def bfs(grid, noOfColumns, noOfRows, start, end, visitedOrder):
                 new.visited = True
 
                 
-def astar():
+def astar(grid, noOfColumns, noOfRows, start, end, visitedOrder):
     print(astar)
