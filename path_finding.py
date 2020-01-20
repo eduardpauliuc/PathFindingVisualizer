@@ -1,17 +1,13 @@
 import pygame
-import sys
-import math
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
 import os
 import time
+from sys import exit
 
-from const import *
-import const
-from algorithms import bfs, astar, dfs
-from models import cell, button
-from popup import changeDimensionsPopup
+from data.const import *
+from data import const
+from data.algorithms import bfs, astar, dfs
+from data.models import cell, button
+from data.popup import changeDimensionsPopup
 
 pygame.font.init()
 
@@ -22,7 +18,6 @@ pygame.display.set_icon(windowIcon)
 screen.fill((255,255,255))
 
 transformIcons()
-
 
 
 startButton = button((128, 255, 255), displayWidth / 9 - 100, 505, 100, 30, screen, text='Place start')

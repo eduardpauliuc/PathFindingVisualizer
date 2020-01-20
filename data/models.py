@@ -1,7 +1,7 @@
 import pygame
 
-from const import *
-import const
+from data.const import *
+from data import const
 
 #  GRID CELL
 class cell:

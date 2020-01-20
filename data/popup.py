@@ -1,8 +1,5 @@
 from tkinter import *
-# from constants import changeDimensions
-import const
-
-
+from data import const
 
 def changeDimensionsPopup():
     window = Tk()
