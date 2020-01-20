@@ -1,6 +1,4 @@
-# from models import cell
 import heapq
-# from queue import PriorityQueue
 from . import const
 
 class MyPriorityQueue:
@@ -26,6 +24,8 @@ def heuristic(cell, end):
     dx = abs(cell.i - end.i)
     dy = abs(cell.j - end.j)
     return max(dx, dy)
+
+    # Euclidian
     # return (end.i - cell.i)**2 + (end.j - cell.j)**2
 
 def bfs(grid, start, end, visitedOrder):
@@ -54,11 +54,7 @@ def bfs(grid, start, end, visitedOrder):
                 prev[(new.i, new.j)] = current
                 new.visited = True
 
-    
-    node = end
-    while (node.i, node.j) in prev and prev[(node.i, node.j)] is not None:
-        node.previous = prev[(node.i, node.j)]
-        node = prev[(node.i, node.j)]
+    reconstructPath(prev, start, end)
 
 def dfs(grid, start, end, visitedOrder):
     start.visited = True
@@ -78,10 +74,8 @@ def dfs(grid, start, end, visitedOrder):
                     return True
 
     look(start)
-    node = end
-    while (node.i, node.j) in prev and prev[(node.i, node.j)] is not None:
-        node.previous = prev[(node.i, node.j)]
-        node = prev[(node.i, node.j)]
+
+    reconstructPath(prev, start, end)
 
 
 def astar(grid, start, end, visitedOrder):
@@ -111,7 +105,10 @@ def astar(grid, start, end, visitedOrder):
                 queue.put([priority, step, next])
                 came_from[(next.i, next.j)] = current
     
+    reconstructPath(came_from, start, end)
+
+def reconstructPath(prev, start, end):
     node = end
-    while (node.i, node.j) in came_from and came_from[(node.i, node.j)] is not None:
-        node.previous = came_from[(node.i, node.j)]
-        node = came_from[(node.i, node.j)]
+    while (node.i, node.j) in prev and prev[(node.i, node.j)] is not None:
+        node.previous = prev[(node.i, node.j)]
+        node = prev[(node.i, node.j)]

@@ -9,17 +9,17 @@ from data.algorithms import bfs, astar, dfs
 from data.models import cell, button
 from data.popup import changeDimensionsPopup
 
-pygame.font.init()
-
-
+# Configure display window
 screen = pygame.display.set_mode((displayWidth, displayHeight))
 pygame.display.set_caption('Path finding visualizer')
 pygame.display.set_icon(windowIcon)
+
+pygame.font.init()
 screen.fill((255,255,255))
 
 transformIcons()
 
-
+# Create buttons
 startButton = button((128, 255, 255), displayWidth / 9 - 100, 505, 100, 30, screen, text='Place start')
 
 endButton = button((255, 77, 77), displayWidth * 2 / 9 - 100, 505, 100, 30, screen, text='Place end')
@@ -53,10 +53,19 @@ def drawButtons():
     screen.blit(settingsIcon, (int(displayWidth * 9 / 8 - 170), 505))
 
 drawButtons()
-# Create Grid
 
 grid = None
+start = None
+end = None
 
+animateSpeed = 0.005
+
+placingStart = False
+placingEnd = False
+
+isAnimating = False
+
+# Create Grid
 def setGrid():
     global grid
 
@@ -67,12 +76,13 @@ def setGrid():
 
 setGrid()
 
+# Make grid border visible
 def borderGrid(clear=False):
     global grid
     color = grey
     if clear:
         color = white
-    # Border grid
+
     for i in range(0,const.noOfRows):
         grid[i][0].make(color)
         grid[i][0].isObstacle = True
@@ -89,19 +99,7 @@ borderGrid()
 
 pygame.init()
 
-start = None
-end = None
 
-running = True
-
-previousClicked = None
-
-animateSpeed = 0.005
-
-placingStart = False
-placingEnd = False
-
-isAnimating = False
 
 def clearBoard():
     global grid, sart, end
@@ -152,6 +150,7 @@ def checkForClicks():
             except AttributeError:
                 pass
 
+# Show cells checked
 def showVisited(visitedOrder):
     global isAnimating
     isAnimating = True
@@ -174,6 +173,7 @@ def showVisited(visitedOrder):
 
     isAnimating = False
 
+# Show final path
 def showPath():
     global isAnimating
     isAnimating = True
@@ -215,24 +215,17 @@ def changeSpeed(x):
     if x == 0:
         animateSpeed = 0.05
         slowButton.draw(True)
-    if x == 1:
+    elif x == 1:
         animateSpeed = 0.005
         normalButton.draw(True)
-    if x == 2:
+    elif x == 2:
         animateSpeed = 0
         fastButton.draw(True)
     
     print('New speed:', animateSpeed)
 
-def prepareStartPlace():
-    global start, placingStart
-    placingStart = True
-    if start != None:
-        start.makeEmpty()
-        start = None
-
+# Place by hovering
 def placeStartPos(x):
-    # print(const.dirRow, const.dirCol, const.noOfColumns)
     row = int(x[1] // (const.h + margin))
     col = int(x[0] // (const.w + margin))
     
@@ -246,6 +239,7 @@ def placeEndPos(x):
     if 1 <= row < const.noOfRows-1 and 1 <= col < const.noOfColumns-1:
         placeEnd(row,col)
 
+# Place by clicking
 def placeStart(row, col):
     global start, placingStart
 
@@ -253,18 +247,26 @@ def placeStart(row, col):
     start.makeStart()
     placingStart = False
 
+def placeEnd(row, col):
+    global end, placingEnd
+    end = grid[row][col]
+    end.makeEnd()
+    placingEnd = False
+
+# Clear the previous start and end
+def prepareStartPlace():
+    global start, placingStart
+    placingStart = True
+    if start != None:
+        start.makeEmpty()
+        start = None
+
 def prepareEndPlace():
     global end, placingEnd
     placingEnd = True
     if end != None:
         end.makeEmpty()
         end = None
-
-def placeEnd(row, col):
-    global end, placingEnd
-    end = grid[row][col]
-    end.makeEnd()
-    placingEnd = False
 
 def settingsPopup():
     changeDimensionsPopup()
@@ -274,8 +276,8 @@ def settingsPopup():
     setGrid()
     borderGrid()
 
-
-# When clicking on cells
+# When clicking
+previousClicked = None
 def mousePress(x):
     global placingStart, start, placingEnd, end, animateSpeed
     
@@ -330,7 +332,7 @@ def mousePress(x):
     row = int(x[1] // (const.h + margin))
     col = int(x[0] // (const.w + margin))
     if 1 <= row < const.noOfRows-1 and 1 <= col < const.noOfColumns-1 and isAnimating == False:
-        #print(row, col)
+        
         if placingStart:
             placeStart(row,col)
 
@@ -346,7 +348,7 @@ def mousePress(x):
                 acess.makeEmpty()
 
 
-while running:
+while True:
     ev = pygame.event.get()
     
     for event in ev:
@@ -371,5 +373,3 @@ while running:
                 placeEndPos(pos)
             elif event.key == pygame.K_c and isAnimating == False:
                 clearBoard()
-
-pygame.quit()

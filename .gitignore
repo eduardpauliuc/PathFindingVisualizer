@@ -1,6 +1,6 @@
 __pycache__
 .vscode/settings.json
-dist
+# dist
 build
 icon.ico
 path_finding.spec
