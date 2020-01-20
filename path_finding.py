@@ -7,62 +7,90 @@ from tkinter import messagebox
 import os
 import time
 
-from constants import *
-from algorithms import bfs, astar
+from const import *
+import const
+from algorithms import bfs, astar, dfs
 from models import cell, button
+from popup import changeDimensionsPopup
 
 pygame.font.init()
 
 
 screen = pygame.display.set_mode((displayWidth, displayHeight))
+pygame.display.set_caption('Path finding visualizer')
+pygame.display.set_icon(windowIcon)
 screen.fill((255,255,255))
 
-grid = [[0 for column in range(noOfColumns)] for row in range(noOfRows)]
+transformIcons()
 
 
-startButton = button(grey, displayWidth / 8 - 100, 505, 100, 30, screen, text='Place start')
-startButton.draw()
 
-endButton = button(grey, displayWidth * 2 / 8 - 100, 505, 100, 30, screen, text='Place end')
-endButton.draw()
+startButton = button((128, 255, 255), displayWidth / 9 - 100, 505, 100, 30, screen, text='Place start')
 
-clearButton = button(grey, displayWidth * 3 / 8 - 100, 505, 100, 30, screen, text='Clear')
-clearButton.draw()
+endButton = button((255, 77, 77), displayWidth * 2 / 9 - 100, 505, 100, 30, screen, text='Place end')
 
-bfsButton = button(grey, displayWidth * 4 / 8 - 100, 505, 100, 30, screen, text='BFS search')
-bfsButton.draw()
+clearButton = button(grey, displayWidth * 3 / 9 - 100, 505, 100, 30, screen, text='Clear')
 
-astarButton = button(grey, displayWidth * 5 / 8 - 100, 505, 100, 30, screen, text='A* search')
-astarButton.draw()
+dfsButton = button((255, 255, 128), displayWidth * 4 / 9 - 100, 505, 100, 30, screen, text='DFS')
 
-slowButton = button(grey, displayWidth * 6 / 8 - 60, 505, 70, 30, screen, text='Slow')
-slowButton.draw()
+bfsButton = button((255, 255, 128), displayWidth * 5 / 9 - 100, 505, 100, 30, screen, text='BFS')
 
-normalButton = button(grey, displayWidth * 7 / 8 - 100, 505, 70, 30, screen, text='Normal')
-normalButton.draw(True)
+astarButton = button((255, 255, 128), displayWidth * 6 / 9 - 100, 505, 100, 30, screen, text='A* search')
 
-fastButton = button(grey, displayWidth * 8 / 8 - 140, 505, 70, 30, screen, text='Fast')
-fastButton.draw()
+slowButton = button(grey, displayWidth * 7 / 9 - 50, 505, 50, 30, screen, text='Slow')
 
-# Create Cells
-for i in range(noOfRows):
-    for j in range(noOfColumns):
-        grid[i][j] = cell(i, j, screen)
+normalButton = button(grey, displayWidth * 8 / 9 - 100, 505, 50, 30, screen, text='Normal')
 
+fastButton = button(grey, displayWidth * 9 / 9 - 152, 505, 50, 30, screen, text='Fast')
 
-# Border grid
-for i in range(0,noOfRows):
-   grid[i][0].make(grey)
-   grid[i][0].isObstacle = True
-   grid[i][noOfColumns-1].isObstacle = True
-   grid[i][noOfColumns-1].make(grey)
+popupButton = button(grey, displayWidth * 10 / 9 - 168, 505, 28, 28, screen, text='')
 
-for j in range(0,noOfColumns):
-    grid[0][j].make(grey)
-    grid[noOfRows-1][j].make(grey)
-    grid[0][j].isObstacle = True
-    grid[noOfRows-1][j].isObstacle = True
+def drawButtons():
+    startButton.draw()
+    endButton.draw()
+    clearButton.draw()
+    dfsButton.draw()
+    bfsButton.draw()
+    astarButton.draw()
+    slowButton.draw()
+    normalButton.draw(True)
+    fastButton.draw()
+    screen.blit(settingsIcon, (int(displayWidth * 9 / 8 - 170), 505))
 
+drawButtons()
+# Create Grid
+
+grid = None
+
+def setGrid():
+    global grid
+
+    grid = [[0 for column in range(const.noOfColumns)] for row in range(const.noOfRows)]
+    for i in range(const.noOfRows):
+        for j in range(const.noOfColumns):
+            grid[i][j] = cell(i, j, screen)
+
+setGrid()
+
+def borderGrid(clear=False):
+    global grid
+    color = grey
+    if clear:
+        color = white
+    # Border grid
+    for i in range(0,const.noOfRows):
+        grid[i][0].make(color)
+        grid[i][0].isObstacle = True
+        grid[i][const.noOfColumns-1].isObstacle = True
+        grid[i][const.noOfColumns-1].make(color)
+
+    for j in range(0,const.noOfColumns):
+        grid[0][j].make(color)
+        grid[const.noOfRows-1][j].make(color)
+        grid[0][j].isObstacle = True
+        grid[const.noOfRows-1][j].isObstacle = True
+
+borderGrid()
 
 pygame.init()
 
@@ -84,14 +112,14 @@ def clearBoard():
     global grid, sart, end
     start = None
     end = None
-    for i in range(1, noOfRows-1):
-        for j in range(1, noOfColumns-1):
+    for i in range(1, const.noOfRows-1):
+        for j in range(1, const.noOfColumns-1):
             grid[i][j] = cell(i,j, screen)
             grid[i][j].makeEmpty()
 
 def prepareForSearch():
-    for row in range(1, noOfRows-1):
-        for col in range(1, noOfColumns-1):
+    for row in range(1, const.noOfRows-1):
+        for col in range(1, const.noOfColumns-1):
             if grid[row][col].isObstacle == False:
                 #print((row,col))
                 if grid[row][col] != end and grid[row][col] != start:
@@ -119,6 +147,8 @@ def checkForClicks():
                     for newev in e:
                         if newev.type == pygame.KEYDOWN and newev.key == pygame.K_SPACE:
                             isPaused = False
+            elif event.key == pygame.K_RETURN:
+                return True
     
     if pygame.mouse.get_pressed()[0]:
             try:
@@ -130,31 +160,54 @@ def checkForClicks():
 def showVisited(visitedOrder):
     global isAnimating
     isAnimating = True
-    for i in range(0, len(visitedOrder) + 4):
+    skipAnimating = False
+    for i in range(0, len(visitedOrder) + 5):
         
         if i <= len(visitedOrder)-1:
-            visitedOrder[i].makePath()
+            if visitedOrder[i] is not start:
+                visitedOrder[i].makeVisited(True)
 
         if i >= 5:
-            visitedOrder[i-5].makeVisited()
+            if visitedOrder[i-5] is not start:
+                visitedOrder[i-5].makeVisited()
 
-        time.sleep(animateSpeed)
+        if skipAnimating == False:
+            time.sleep(animateSpeed)
+
         if checkForClicks():
-            return
+            skipAnimating = True
 
     isAnimating = False
 
 def showPath():
     global isAnimating
     isAnimating = True
+    step = 0
+    path = []
+    skipAnimation = False
     if end.visited == True:
         before = end.previous
         while before != start:
-            before.makePath()
+            path.append(before)
+            step+=1
             before = before.previous
-            time.sleep(0.02)
-            if checkForClicks():
-                return
+
+    i = len(path) - 1
+    while i >= -1:
+
+        if i > -1:
+            path[i].makePath(True)
+        if i < len(path) - 1:
+            path[i+1].makePath()
+
+        if skipAnimation == False:
+            time.sleep(0.12)
+        i-=1
+
+        if checkForClicks():
+            skipAnimation = True
+
+    print('steps: ', step)
     isAnimating = False
 
 def changeSpeed(x):
@@ -176,42 +229,95 @@ def changeSpeed(x):
     
     print('New speed:', animateSpeed)
 
-def placeStart():
+def prepareStartPlace():
     global start, placingStart
     placingStart = True
     if start != None:
         start.makeEmpty()
         start = None
 
-def placeEnd():
+def placeStartPos(x):
+    # print(const.dirRow, const.dirCol, const.noOfColumns)
+    row = int(x[1] // (const.h + margin))
+    col = int(x[0] // (const.w + margin))
+    
+    if 1 <= row < const.noOfRows-1 and 1 <= col < const.noOfColumns-1:
+        placeStart(row,col)
+
+def placeEndPos(x):
+    row = int(x[1] // (const.h + margin))
+    col = int(x[0] // (const.w + margin))
+    
+    if 1 <= row < const.noOfRows-1 and 1 <= col < const.noOfColumns-1:
+        placeEnd(row,col)
+
+def placeStart(row, col):
+    global start, placingStart
+
+    start = grid[row][col]
+    start.makeStart()
+    placingStart = False
+
+def prepareEndPlace():
     global end, placingEnd
     placingEnd = True
     if end != None:
         end.makeEmpty()
         end = None
 
+def placeEnd(row, col):
+    global end, placingEnd
+    end = grid[row][col]
+    end.makeEnd()
+    placingEnd = False
+
+def settingsPopup():
+    changeDimensionsPopup()
+    pygame.draw.rect(screen, white, (0, 0, gridWidth, gridHeight))
+    setDimensions()
+    transformIcons()
+    setGrid()
+    borderGrid()
+
+
 # When clicking on cells
 def mousePress(x):
+    print('clinck')
     global placingStart, start, placingEnd, end, animateSpeed
     
     if startButton.isOver(x) and isAnimating == False:
-        placeStart()
+        prepareStartPlace()
     
     if endButton.isOver(x) and isAnimating == False:
-        placeEnd()
+        prepareEndPlace()
     
-    if bfsButton.isOver(x):
+    if dfsButton.isOver(x) and isAnimating == False:
         if start != None and end != None:
             visitedOrder = []
             prepareForSearch()
-            bfs(grid, noOfColumns, noOfRows, start, end, visitedOrder)
+            dfs(grid, start, end, visitedOrder)
+            showVisited(visitedOrder)
+            showPath()
+
+
+    if bfsButton.isOver(x) and isAnimating == False:
+        if start != None and end != None:
+            visitedOrder = []
+            prepareForSearch()
+            bfs(grid, start, end, visitedOrder)
             showVisited(visitedOrder)
             showPath()
     
-    if astarButton.isOver(x):
+    if astarButton.isOver(x) and isAnimating == False:
         if start != None and end != None:
+            visitedOrder = []
             prepareForSearch()
-            astar()
+            astar(grid, start, end, visitedOrder)
+            showVisited(visitedOrder)
+            showPath()
+
+    if popupButton.isOver(x):
+        settingsPopup()
     
     if slowButton.isOver(x):
         changeSpeed(0)
@@ -227,18 +333,15 @@ def mousePress(x):
     
     # if you clicked a cell
     global previousClicked
-    row = int(x[1] // (h+margin))
-    col = int(x[0] // (w+margin))
-    if 1 <= row < noOfRows-1 and 1 <= col < noOfColumns-1 and isAnimating == False:
+    row = int(x[1] // (const.h + margin))
+    col = int(x[0] // (const.w + margin))
+    if 1 <= row < const.noOfRows-1 and 1 <= col < const.noOfColumns-1 and isAnimating == False:
+        #print(row, col)
         if placingStart:
-            start = grid[row][col]
-            start.makeStart()
-            placingStart = False
+            placeStart(row,col)
 
         if placingEnd:
-            end = grid[row][col]
-            end.makeEnd()
-            placingEnd = False
+            placeEnd(row,col)
 
         acess = grid[row][col]
         if acess != start and acess != end and acess != previousClicked:
@@ -251,13 +354,13 @@ def mousePress(x):
 
 while running:
     ev = pygame.event.get()
-
+    
     for event in ev:
         if event.type == pygame.QUIT:
             pygame.display.quit()
             pygame.quit()
             exit()
-        if pygame.mouse.get_pressed()[0]:
+        elif pygame.mouse.get_pressed()[0]:
             try:
                 pos = pygame.mouse.get_pos()
                 mousePress(pos)
@@ -265,10 +368,14 @@ while running:
                 pass
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_s:
-                placeStart()
-            if event.key == pygame.K_e:
-                placeEnd()
-            if event.key == pygame.K_c and isAnimating == False:
+                pos = pygame.mouse.get_pos()
+                prepareStartPlace()
+                placeStartPos(pos)
+            elif event.key == pygame.K_e:
+                pos = pygame.mouse.get_pos()
+                prepareEndPlace()
+                placeEndPos(pos)
+            elif event.key == pygame.K_c and isAnimating == False:
                 clearBoard()
 
 pygame.quit()

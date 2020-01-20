@@ -1,6 +1,7 @@
 import pygame
 
-from constants import *
+from const import *
+import const
 
 #  GRID CELL
 class cell:
@@ -14,55 +15,62 @@ class cell:
         self.closed = False
         self.value = 1
         self.screen = screen
-    
+
     # Display cell
     def make(self, color):
-        pygame.draw.rect(self.screen, color, (self.j * (w + margin) + margin, self.i * (h + margin) + margin, w, h))
+        pygame.draw.rect(self.screen, color, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin, const.w, const.h))
         pygame.display.update()
 
     def makeEmpty(self):
         self.isObstacle = False
-        pygame.draw.rect(self.screen, white, (self.j * (w + margin) + margin, self.i * (h + margin) + margin, w, h))
+        pygame.draw.rect(self.screen, white, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin, const.w, const.h))
         pygame.display.update()
     
     def makeObstacle(self):
         self.isObstacle = True
-        self.screen.blit(fireIcon, (self.j * (w + margin) + margin, self.i * (h + margin) + margin))
+        self.screen.blit(const.fireIcon, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin))
         pygame.display.update()
 
     def makeStart(self):
-        self.screen.blit(startIcon, (self.j * (w + margin) + margin, self.i * (h + margin) + margin))
+        self.screen.blit(const.startIcon, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin))
         pygame.display.update()
     
     def makeEnd(self):
-        self.screen.blit(endIcon, (self.j * (w + margin) + margin, self.i * (h + margin) + margin))
+        self.screen.blit(const.endIcon, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin))
         pygame.display.update()
     
-    def makeVisited(self):
-        pygame.draw.rect(self.screen, turqoise, (self.j * (w + margin) + margin, self.i * (h + margin) + margin, w, h))
+    def makeVisited(self, first=False):
+        if first == True:
+            pygame.draw.rect(self.screen, (0, 102, 102), (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin, const.w, const.h))
+        else:
+            pygame.draw.rect(self.screen, turqoise, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin, const.w, const.h))
         pygame.display.update()
 
-    def makePath(self):
-        pygame.draw.rect(self.screen, purple, (self.j * (w + margin) + margin, self.i * (h + margin) + margin, w, h))
+    def makePath(self, first=False):
+        if first == True:
+            self.screen.blit(const.pathIcon, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin))
+        else: 
+            pygame.draw.rect(self.screen, red, (self.j * (const.w + margin) + margin, self.i * (const.h + margin) + margin, const.w, const.h))
+        
+        
         pygame.display.update()
 
     # Set cell as path
     def path(self, color):
-        pygame.draw.rect(self.screen, color, (self.i * (w + margin) + margin, self.j * (h + margin) + margin, w, h))
+        pygame.draw.rect(self.screen, color, (self.i * (const.w + margin) + margin, self.j * (const.h + margin) + margin, const.w, const.h))
         pygame.display.update()
 
     # Add neighbors list to cell object
     def addNeighbors(self, grid):
         i = self.i
         j = self.j
-        if i > 0 and grid[self.i - 1][j].isObstacle == False:
-            self.neighbors.append(grid[self.i - 1][j])
-        if j < noOfColumns-1 and grid[self.i][j + 1].isObstacle == False:
-            self.neighbors.append(grid[self.i][j + 1])
-        if i < noOfRows-1 and grid[self.i + 1][j].isObstacle == False:
-            self.neighbors.append(grid[self.i + 1][j])
-        if j > 0 and grid[self.i][j - 1].isObstacle == False:
-            self.neighbors.append(grid[self.i][j - 1])
+
+        for dir in range(const.noOfDirections):
+            newI = i + const.dirRow[dir]
+            newJ = j + const.dirCol[dir]
+
+            if 0 < newI < const.noOfRows-1 and 0 < newJ < const.noOfColumns-1 and grid[newI][newJ].isObstacle == False:
+                self.neighbors.append(grid[newI][newJ])
 
 # BUTTON
 class button():
