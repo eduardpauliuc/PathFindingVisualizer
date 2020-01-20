@@ -43,7 +43,7 @@ normalButton = button(grey, displayWidth * 8 / 9 - 100, 505, 50, 30, screen, tex
 
 fastButton = button(grey, displayWidth * 9 / 9 - 152, 505, 50, 30, screen, text='Fast')
 
-popupButton = button(grey, displayWidth * 10 / 9 - 168, 505, 28, 28, screen, text='')
+popupButton = button(grey, displayWidth * 10 / 9 - 155, 505, 28, 28, screen, text='')
 
 def drawButtons():
     startButton.draw()
@@ -282,7 +282,6 @@ def settingsPopup():
 
 # When clicking on cells
 def mousePress(x):
-    print('clinck')
     global placingStart, start, placingEnd, end, animateSpeed
     
     if startButton.isOver(x) and isAnimating == False:

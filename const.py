@@ -45,20 +45,20 @@ startIcon = None
 endIcon = None
 pathIcon = None
 
-settingsIcon = pygame.image.load('settings.jpg')
+settingsIcon = pygame.image.load('resources/settings.jpg')
 settingsIcon = pygame.transform.scale(settingsIcon, (int(w),int(h)))
-windowIcon = pygame.image.load('xi.png')
+windowIcon = pygame.image.load('resources/xi.png')
 windowIcon = pygame.transform.scale(windowIcon, (32,32))
 
 def transformIcons():
     global fireIcon, startIcon, endIcon, pathIcon
-    fireIcon = pygame.image.load('fire.jpg')
+    fireIcon = pygame.image.load('resources/fire.jpg')
     fireIcon = pygame.transform.scale(fireIcon, (int(w),int(h)))
-    startIcon = pygame.image.load('start.png')
+    startIcon = pygame.image.load('resources/start.png')
     startIcon = pygame.transform.scale(startIcon, (int(w),int(h)))
-    endIcon = pygame.image.load('end.png')
+    endIcon = pygame.image.load('resources/end.png')
     endIcon = pygame.transform.scale(endIcon, (int(w),int(h)))
-    pathIcon = pygame.image.load('path.png')
+    pathIcon = pygame.image.load('resources/path.png')
     pathIcon = pygame.transform.scale(pathIcon, (int(w),int(h)))
 
 
@@ -83,6 +83,6 @@ def setDirections(x):
         dirRow = [-1, 0, 1, 0, -1, 1, 1, -1]
         dirCol = [0, 1, 0, -1, 1, 1, -1, -1]
     
-setDirections(8)
+setDirections(4)
 
 
