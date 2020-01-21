@@ -19,7 +19,7 @@ def changeDimensionsPopup():
     def onsubmit():
         newCols = columnsBox.get()
         newRows = rowsBox.get()
-        if newCols and newRows:
+        if newCols.isnumeric() and 5 <= int(newCols) <= 100 and newRows.isnumeric() and 5 <= int(newRows) <= 50:
             const.noOfColumns = int(newCols)
             const.noOfRows = int(newRows)
 

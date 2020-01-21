@@ -12,7 +12,7 @@ class MyPriorityQueue:
         heapq.heappush(self.elements, qitem)
     
     def get(self):
-        return heapq.heappop(self.elements)[2]
+        return heapq.heappop(self.elements)
 
         
 def heuristic(cell, end):
@@ -38,7 +38,7 @@ def bfs(grid, start, end, visitedOrder):
     prev = {}
     prev[(start.i, start.j)] = None
     while not queue.empty():
-        current = queue.get()
+        current = queue.get()[2]
         if(current == end):
             end.visited = True
             break
@@ -86,13 +86,19 @@ def astar(grid, start, end, visitedOrder):
     cost_so_far = {}
     came_from[(start.i, start.j)] = None
     cost_so_far[(start.i, start.j)] = 0 
+    hasStep = {}
+    hasStep[(start.i, start.j)] = 0
 
     
     while not queue.empty():
-        current = queue.get()
+        top = queue.get()
+        current = top[2]
         if current == end:
             end.visited = True
             break
+        
+        if (current.i,current.j) in hasStep and hasStep[(current.i, current.j)] != top[1]:
+            continue
 
         visitedOrder.append(current)
 
@@ -102,6 +108,7 @@ def astar(grid, start, end, visitedOrder):
                 cost_so_far[(next.i, next.j)] = new_cost
                 priority = new_cost + heuristic(next, end)
                 step -=1
+                hasStep[(next.i, next.j)] = step
                 queue.put([priority, step, next])
                 came_from[(next.i, next.j)] = current
     

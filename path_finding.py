@@ -242,28 +242,35 @@ def placeEndPos(x):
 # Place by clicking
 def placeStart(row, col):
     global start, placingStart
-
     start = grid[row][col]
+    start.isObstacle = False
+    start.makeEmpty()
     start.makeStart()
     placingStart = False
 
 def placeEnd(row, col):
     global end, placingEnd
     end = grid[row][col]
+    end.isObstacle = False
+    end.makeEmpty()
     end.makeEnd()
     placingEnd = False
 
 # Clear the previous start and end
 def prepareStartPlace():
-    global start, placingStart
+    global start, placingEnd, placingStart
+    if placingEnd:
+        placingEnd = False
     placingStart = True
     if start != None:
         start.makeEmpty()
         start = None
 
 def prepareEndPlace():
-    global end, placingEnd
+    global end, placingEnd, placingStart
     placingEnd = True
+    if placingStart:
+        placingStart = False
     if end != None:
         end.makeEmpty()
         end = None
@@ -362,7 +369,9 @@ while True:
                 mousePress(pos)
             except AttributeError:
                 pass
-        elif event.type == pygame.KEYDOWN:
+        else:
+            previousClicked = None
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_s:
                 pos = pygame.mouse.get_pos()
                 prepareStartPlace()
