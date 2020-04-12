@@ -102,7 +102,7 @@ pygame.init()
 
 
 def clearBoard():
-    global grid, sart, end
+    global grid, start, end
     start = None
     end = None
     for i in range(1, const.noOfRows-1):
